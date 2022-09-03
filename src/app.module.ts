@@ -14,7 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: 'postgres://postgres:postgrespw@localhost:55000/easy_story_db',
+      url: `${process.env.DATABASE_URL}`,
       autoLoadEntities: true,
       synchronize: true,
     }),
