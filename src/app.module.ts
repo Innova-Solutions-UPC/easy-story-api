@@ -7,9 +7,17 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { HashtagsModule } from './hashtags/hashtags.module';
 import { QualificationsModule } from './qualifications/qualifications.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { AuthModule } from './auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      url: 'postgres://postgres:postgrespw@localhost:55000/easy_story_db',
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
     UsersModule,
     PostsModule,
     CommentsModule,
@@ -17,6 +25,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     HashtagsModule,
     QualificationsModule,
     SubscriptionsModule,
+    AuthModule,
   ],
   controllers: [AppController],
 })
