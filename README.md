@@ -22,3 +22,7 @@ To run this project, you will need to add the following environment variables to
 - Nest Framework 😼
 - PostgreSQL & TypeORM 📁
 - Docker 🐳
+## Live URL 
+Want to see it in action? Production URL:
+
+https://easy-story-api.onrender.com/api-docs
