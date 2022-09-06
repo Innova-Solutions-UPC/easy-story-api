@@ -4,6 +4,10 @@ import { Controller, Get } from '@nestjs/common';
 export class AppController {
   @Get()
   getHello() {
-    return { name: 'Hello World!' };
+    return {
+      name: 'Easy Story API',
+      version: '1',
+      message: 'Hello World!',
+    };
   }
 }

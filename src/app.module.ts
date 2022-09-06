@@ -9,6 +9,8 @@ import { QualificationsModule } from './qualifications/qualifications.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HealthModule } from './health/health.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       url: `${process.env.DATABASE_URL}`,
       autoLoadEntities: true,
       synchronize: true,
+      entityPrefix: 'ds_',
     }),
+    AuthModule,
     UsersModule,
     PostsModule,
     CommentsModule,
@@ -25,8 +29,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     HashtagsModule,
     QualificationsModule,
     SubscriptionsModule,
-    AuthModule,
+    HealthModule,
   ],
   controllers: [AppController],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

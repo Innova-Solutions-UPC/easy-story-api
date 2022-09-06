@@ -1,13 +1,17 @@
 import { Exclude } from 'class-transformer';
+import { Post } from '../../posts/entities/post.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('r_users')
+@Entity({
+  name: 'users',
+})
 export class User {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
@@ -27,6 +31,9 @@ export class User {
 
   @Column({ default: false, type: 'boolean' })
   verified: boolean;
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

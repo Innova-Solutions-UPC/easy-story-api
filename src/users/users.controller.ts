@@ -9,6 +9,8 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   Query,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,6 +22,7 @@ import { ApiTags } from '@nestjs/swagger';
   path: 'users',
   version: '1',
 })
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
