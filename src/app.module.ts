@@ -13,22 +13,23 @@ import { HealthModule } from './health/health.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 10,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: `${
-        process.env.DATABASE_URL ||
-        'postgres://postgres:postgrespw@localhost:55000/easy_story_db'
-      }`,
-      autoLoadEntities: true,
-      synchronize: true,
-      entityPrefix: 'ds_',
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'postgres',
+        url: process.env.DATABASE_URL,
+        autoLoadEntities: true,
+        synchronize: true,
+        entityPrefix: 'ds_',
+      }),
     }),
     AuthModule,
     UsersModule,

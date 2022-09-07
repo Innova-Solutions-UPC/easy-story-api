@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PostMetadata } from './post-metadata.entity';
 
 @Entity({
   name: 'posts',
@@ -32,6 +34,11 @@ export class Post {
 
   @ManyToOne(() => User, (author) => author.posts)
   author: User;
+
+  @OneToOne(() => PostMetadata, (metadata) => metadata.post, {
+    cascade: true,
+  })
+  metadata: PostMetadata;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

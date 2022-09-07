@@ -20,6 +20,9 @@ export class PostsService {
       ...createPostDto,
       slug: createPostDto.title.replace(/\s/g, '-').toLowerCase(),
       author: author,
+      metadata: {
+        views: 0,
+      },
     });
     return this.postsRepository.save(post);
   }
