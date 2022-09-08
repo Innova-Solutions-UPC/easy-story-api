@@ -8,8 +8,11 @@ import {
   Delete,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { CommentsService } from './comments.service';
@@ -20,6 +23,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 @Controller({
   version: '1',
 })
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
@@ -34,8 +38,16 @@ export class CommentsController {
   }
 
   @Get('/posts/:postId/comments')
-  findAllByPost() {
-    return this.commentsService.findAll();
+  findAllByPost(
+    @Param('postId') postId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
+  ) {
+    return this.commentsService.findAllByPost(+postId, {
+      page,
+      limit,
+      route: `/v1/posts/${postId}/comments`,
+    });
   }
 
   @Get('/comments/:id')

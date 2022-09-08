@@ -20,7 +20,7 @@ export class Comment {
   @Column({ type: 'text' })
   content: string;
 
-  @ManyToOne(() => User, {
+  @ManyToOne(() => Post, {
     nullable: false,
     onDelete: 'CASCADE',
   })
@@ -34,7 +34,7 @@ export class Comment {
 
   @Expose()
   edited(): boolean {
-    return this.updatedAt !== this.createdAt;
+    return this.updatedAt == this.createdAt;
   }
 
   @CreateDateColumn({ type: 'timestamp' })
