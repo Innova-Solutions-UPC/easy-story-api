@@ -13,14 +13,14 @@ import {
   name: 'users',
 })
 export class User {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true, length: 50, type: 'varchar' })
   email: string;
 
   @Exclude()
-  @Column({ length: 100, type: 'varchar' })
+  @Column({ length: 96, type: 'varchar' })
   password: string;
 
   @Column({ length: 20, type: 'varchar' })

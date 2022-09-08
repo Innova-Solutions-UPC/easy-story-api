@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { HashtagsService } from './hashtags.service';
 import { CreateHashtagDto } from './dto/create-hashtag.dto';
-import { UpdateHashtagDto } from './dto/update-hashtag.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Hashtags')
@@ -30,15 +29,5 @@ export class HashtagsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.hashtagsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHashtagDto: UpdateHashtagDto) {
-    return this.hashtagsService.update(+id, updateHashtagDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.hashtagsService.remove(+id);
   }
 }

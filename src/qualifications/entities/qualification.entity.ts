@@ -4,6 +4,6 @@ import { Entity, PrimaryGeneratedColumn } from 'typeorm';
   name: 'qualifications',
 })
 export class Qualification {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn()
   id: number;
 }

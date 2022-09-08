@@ -81,11 +81,40 @@ export class CommentsService {
     return comment;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  /**
+   * It updates a comment with the given id, if the comment belongs to the given user
+   * @param {number} id - The id of the comment to update
+   * @param {User} user - User - the user object that is passed in from the auth guard
+   * @param {UpdateCommentDto} updateCommentDto - UpdateCommentDto
+   * @returns The updated comment
+   */
+  async update(
+    id: number,
+    user: User,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<Comment> {
+    const comment = await this.findOne(id);
+    if (comment.user.id !== user.id) {
+      throw new BadRequestException('You cannot edit this comment');
+    }
+    return this.commentsRepository.save({
+      ...comment,
+      content: updateCommentDto.content,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  /**
+   * If the comment's user id is not the same as the user id passed in, throw an error. Otherwise,
+   * delete the comment
+   * @param {number} id - number - the id of the comment we want to delete
+   * @param {User} user - User - this is the user that is currently logged in.
+   * @returns The comment that was deleted.
+   */
+  async remove(id: number, user: User) {
+    const comment = await this.findOne(id);
+    if (comment.user.id !== user.id) {
+      throw new BadRequestException('You cannot delete this comment');
+    }
+    return this.commentsRepository.remove(comment);
   }
 }

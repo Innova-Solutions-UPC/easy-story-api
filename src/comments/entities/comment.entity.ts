@@ -14,7 +14,7 @@ import { Expose } from 'class-transformer';
   name: 'comments',
 })
 export class Comment {
-  @PrimaryGeneratedColumn({ type: 'integer' })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'text' })

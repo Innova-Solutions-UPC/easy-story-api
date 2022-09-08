@@ -12,7 +12,7 @@ import {
   name: 'hashtags',
 })
 export class Hashtag {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true, length: 25, type: 'varchar' })

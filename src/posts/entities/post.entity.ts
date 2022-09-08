@@ -18,7 +18,7 @@ import { PostStatus } from '../enums/post-status.enum';
   name: 'posts',
 })
 export class Post {
-  @PrimaryGeneratedColumn({ type: 'integer' })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 100, type: 'varchar' })

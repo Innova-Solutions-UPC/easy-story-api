@@ -67,7 +67,8 @@ export class PostsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  @ApiOperation({ summary: 'Delete a post' })
+  remove(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.postsService.remove(+id, user);
   }
 }

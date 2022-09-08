@@ -23,16 +23,10 @@ export class HashtagsService {
     return `This action returns a #${id} hashtag`;
   }
 
-  update(id: number, updateHashtagDto: UpdateHashtagDto) {
-    return `This action updates a #${id} hashtag`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} hashtag`;
-  }
-
   async preloadHashtagByName(name: string): Promise<Hashtag> {
-    const hashtag = await this.hashtagsRepository.findOne({ where: { name } });
+    const hashtag = await this.hashtagsRepository.findOne({
+      where: { name: name.toLowerCase() },
+    });
     if (hashtag) {
       return hashtag;
     }

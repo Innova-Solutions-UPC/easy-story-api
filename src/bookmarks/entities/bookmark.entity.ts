@@ -13,7 +13,7 @@ import {
   name: 'bookmarks',
 })
 export class Bookmark {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'text', default: '' })
