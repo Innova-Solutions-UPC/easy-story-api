@@ -6,37 +6,64 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/current-user.decorator';
 import { User } from '../users/entities/user.entity';
+import { Public } from '../common/public.decorator';
 
-@ApiTags('posts')
-@Controller('posts')
+@ApiBearerAuth()
+@ApiTags('Posts')
+@Controller({
+  path: 'posts',
+  version: '1',
+})
+@UseInterceptors(ClassSerializerInterceptor)
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new post' })
   create(@CurrentUser() user: User, @Body() createPostDto: CreatePostDto) {
     return this.postsService.create(user, createPostDto);
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  @Public()
+  @ApiOperation({ summary: 'Retrieve all posts' })
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
+  ) {
+    return this.postsService.findAll({
+      page,
+      limit,
+      route: '/v1/posts',
+    });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  @Get(':slug')
+  @ApiOperation({ summary: 'Get a post by slug' })
+  findOneBySlug(@Param('slug') slug: string) {
+    return this.postsService.findOneBySlug(slug);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @ApiOperation({ summary: 'Update a post' })
+  update(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    return this.postsService.update(+id, user, updatePostDto);
   }
 
   @Delete(':id')

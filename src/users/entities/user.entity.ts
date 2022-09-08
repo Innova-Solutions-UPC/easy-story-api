@@ -32,9 +32,6 @@ export class User {
   @Column({ default: false, type: 'boolean' })
   verified: boolean;
 
-  @OneToMany(() => Post, (post) => post.author)
-  posts: Post[];
-
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

@@ -29,8 +29,7 @@ export class AuthController {
   @Public()
   @Post('login')
   @ApiOperation({
-    summary: 'Get a new access token',
-    description: 'Get a new access token',
+    summary: 'Create a new session',
   })
   async login(@Body() loginEmailDto: LoginEmailDto) {
     return this.authService.loginWithEmail(loginEmailDto);

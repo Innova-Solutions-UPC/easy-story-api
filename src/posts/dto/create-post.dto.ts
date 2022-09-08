@@ -12,4 +12,7 @@ export class CreatePostDto {
 
   @IsString()
   image: string;
+
+  @IsString({ each: true })
+  hashtags: string[];
 }

@@ -8,6 +8,7 @@ import {
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
+import { Public } from '../common/public.decorator';
 
 @ApiTags('Health Check')
 @Controller({
@@ -23,6 +24,7 @@ export class HealthController {
   ) {}
 
   @Get()
+  @Public()
   @HealthCheck()
   check() {
     return this.health.check([

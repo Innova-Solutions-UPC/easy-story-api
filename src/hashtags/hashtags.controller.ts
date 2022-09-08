@@ -12,8 +12,8 @@ import { CreateHashtagDto } from './dto/create-hashtag.dto';
 import { UpdateHashtagDto } from './dto/update-hashtag.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('hashtags')
-@Controller('hashtags')
+@ApiTags('Hashtags')
+@Controller({ path: 'hashtags', version: '1' })
 export class HashtagsController {
   constructor(private readonly hashtagsService: HashtagsService) {}
 

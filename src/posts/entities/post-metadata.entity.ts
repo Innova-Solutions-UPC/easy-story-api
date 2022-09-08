@@ -17,6 +17,9 @@ export class PostMetadata {
   @Column('int', { default: 0 })
   views: number;
 
+  @Column('int', { default: 0 })
+  shares: number;
+
   @OneToOne(() => Post)
   @JoinColumn()
   post: Post;

@@ -3,22 +3,29 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { PostMetadata } from './post-metadata.entity';
+import { Hashtag } from '../../hashtags/entities/hashtag.entity';
+import { PostStatus } from '../enums/post-status.enum';
 
 @Entity({
   name: 'posts',
 })
 export class Post {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn({ type: 'integer' })
   id: number;
 
   @Column({ length: 100, type: 'varchar' })
   title: string;
+
+  @Column({ type: 'enum', enum: PostStatus, default: PostStatus.DRAFT })
+  status: PostStatus;
 
   @Column({ length: 100, type: 'varchar', unique: true })
   slug: string;
@@ -32,8 +39,16 @@ export class Post {
   @Column({ length: 100, type: 'varchar' })
   image: string;
 
-  @ManyToOne(() => User, (author) => author.posts)
+  @ManyToOne(() => User)
   author: User;
+
+  @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'posts_hashtags',
+  })
+  hashtags: Hashtag[];
 
   @OneToOne(() => PostMetadata, (metadata) => metadata.post, {
     cascade: true,
