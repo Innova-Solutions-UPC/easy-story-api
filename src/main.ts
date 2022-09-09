@@ -16,6 +16,11 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+  /* Enabling CORS for the application. */
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: 'GET,HEAD,PATCH,POST,DELETE,OPTIONS',
+  });
   /* Configuring validation pipes */
   app.useGlobalPipes(
     new ValidationPipe({
