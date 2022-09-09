@@ -73,7 +73,7 @@ export class PostsService {
         hashtags: true,
       },
       where: {
-        status: PostStatus.DRAFT,
+        status: PostStatus.PUBLISHED,
       } as FindOptionsWhere<Post>,
       order: {
         createdAt: 'DESC',

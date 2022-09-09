@@ -17,7 +17,6 @@ import { RegisterEmailDto } from './dto/register-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Authentication & Authorization')
-@ApiBearerAuth()
 @Controller({
   path: 'auth',
   version: '1',
@@ -28,6 +27,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create a new session',
   })
@@ -56,6 +56,7 @@ export class AuthController {
   }
 
   @Get('user')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get the current authenticated user',
   })
@@ -64,6 +65,7 @@ export class AuthController {
   }
 
   @Patch('user')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update the current authenticated user',
   })
@@ -75,6 +77,7 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Change the current authenticated user password',
   })

@@ -16,9 +16,28 @@ export class BookmarksService {
     @InjectRepository(Bookmark)
     private bookmarksRepository: Repository<Bookmark>,
   ) {}
-  create(createBookmarkDto: CreateBookmarkDto, user: User): Promise<Bookmark> {
+
+  /**
+   * If the user is trying to bookmark a post that isn't theirs, throw an error. If the user is trying
+   * to bookmark a post that they've already bookmarked, throw an error. Otherwise, create a new
+   * bookmark and save it to the database
+   * @param {CreateBookmarkDto} createBookmarkDto - CreateBookmarkDto
+   * @param {User} user - User - This is the user object that was retrieved from the JWT token.
+   * @returns The bookmark that was created.
+   */
+  async create(
+    createBookmarkDto: CreateBookmarkDto,
+    user: User,
+  ): Promise<Bookmark> {
     if (createBookmarkDto.user && user.id !== +createBookmarkDto.user) {
       throw new BadRequestException('You can only bookmark your own posts');
+    }
+    const existingBookmark = await this.bookmarksRepository.findOneBy({
+      user,
+      post: { id: +createBookmarkDto.post },
+    });
+    if (existingBookmark) {
+      throw new BadRequestException('You already bookmarked this post');
     }
     const bookmark = this.bookmarksRepository.create({
       post: { id: +createBookmarkDto.post },
@@ -27,6 +46,14 @@ export class BookmarksService {
     return this.bookmarksRepository.save(bookmark);
   }
 
+  /**
+   * It returns a paginated list of bookmarks for the current user, optionally filtered by post
+   * @param {IPaginationOptions} options - IPaginationOptions - This is the options object that we pass
+   * to the paginate function.
+   * @param {User} currentUser - The user who is making the request.
+   * @param {string} [postId] - The id of the post to filter by.
+   * @returns A paginated list of bookmarks.
+   */
   findAll(
     options: IPaginationOptions,
     currentUser: User,
@@ -46,6 +73,11 @@ export class BookmarksService {
     return paginate<Bookmark>(this.bookmarksRepository, options, query);
   }
 
+  /**
+   * It finds a bookmark by its id and throws an error if it doesn't exist
+   * @param {number} id - number - the id of the bookmark we want to find
+   * @returns A bookmark
+   */
   async findOne(id: number): Promise<Bookmark> {
     const bookmark = await this.bookmarksRepository.findOneBy({ id });
     if (!bookmark) {
@@ -54,6 +86,13 @@ export class BookmarksService {
     return bookmark;
   }
 
+  /**
+   * If the bookmark's user id is not the same as the user id passed in, throw an error. Otherwise,
+   * delete the bookmark
+   * @param {number} id - number - The id of the bookmark to delete
+   * @param {User} user - User - This is the user that is currently logged in.
+   * @returns The removed bookmark
+   */
   async remove(id: number, user: User): Promise<Bookmark> {
     const bookmark = await this.findOne(id);
     if (bookmark.user.id !== user.id) {

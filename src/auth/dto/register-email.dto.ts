@@ -1,7 +1,18 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import {
+  IsAlphanumeric,
+  IsEmail,
+  IsLowercase,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class RegisterEmailDto {
+  @IsAlphanumeric()
+  @IsLowercase()
+  username: string;
+
   @IsEmail()
+  @IsLowercase()
   email: string;
 
   @Length(8, 50)
