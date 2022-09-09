@@ -38,6 +38,7 @@ export class UsersService {
       email: createUserDto.email.toLowerCase(),
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
+      username: createUserDto.username,
       verified: true,
       password: await argon2.hash(createUserDto.password),
     });
