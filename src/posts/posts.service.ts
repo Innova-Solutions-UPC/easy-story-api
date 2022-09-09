@@ -158,6 +158,22 @@ export class PostsService {
     return this.postsRepository.save(post);
   }
 
+  async updateMetadata(id: number, action: string): Promise<Post> {
+    // TODO: Add a check to see if the action is valid
+    const metadata = {};
+    if (action === 'view') {
+      metadata['views'] = () => 'views + 1';
+    }
+    if (action === 'share') {
+      metadata['shares'] = () => 'shares + 1';
+    }
+    const post = await this.findOne(id);
+    return this.postsRepository.save({
+      ...post,
+      metadata,
+    });
+  }
+
   /**
    * If the post exists, and the user is the author of the post, then delete the post
    * @param {number} id - number - the id of the post we want to delete

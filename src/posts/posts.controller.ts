@@ -89,6 +89,13 @@ export class PostsController {
     return this.postsService.update(+id, user, updatePostDto);
   }
 
+  @Public()
+  @Patch(':id/metadata')
+  @ApiOperation({ summary: 'Post metadata' })
+  updateMetadata(@Param('id') id: string, @Query('action') action: string) {
+    return this.postsService.updateMetadata(+id, action);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a post' })
   remove(@Param('id') id: string, @CurrentUser() user: User) {

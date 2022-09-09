@@ -80,6 +80,7 @@ export class AuthService {
    */
   generateTokens(user: User) {
     const accessToken = this.jwtService.sign({
+      username: user.username,
       email: user.email,
       sub: user.id,
     });
