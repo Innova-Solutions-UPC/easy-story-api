@@ -5,6 +5,7 @@ import { LoginEmailDto } from './dto/login-email.dto';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { RegisterEmailDto } from './dto/register-email.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -69,8 +70,9 @@ export class AuthService {
    * @param {User} user - User - the user object that is passed in from the request
    * @returns A promise of a user object.
    */
-  getCurrentUser(user: User): Promise<User> {
-    return this.usersService.findOne(user.id);
+  async getCurrentUser(currentUser: User) {
+    const user = await this.usersService.findOne(currentUser.id);
+    return { authenticatedUser: user };
   }
 
   /**
@@ -78,25 +80,47 @@ export class AuthService {
    * @param {User} user - User - The user object that was returned from the database.
    * @returns An object with the accessToken, refreshToken, and authenticatedUser.
    */
-  generateTokens(user: User) {
+  generateTokens(user: User, refreshJwt?: string) {
     const accessToken = this.jwtService.sign({
       username: user.username,
       email: user.email,
       sub: user.id,
     });
-    const refreshToken = this.jwtService.sign(
-      {
-        email: user.email,
-        sub: user.id,
-      },
-      {
-        expiresIn: '30d',
-        secret: process.env.JWT_SECRET + user.password,
-      },
-    );
+    const refreshToken = refreshJwt
+      ? refreshJwt
+      : this.jwtService.sign(
+          {
+            email: user.email,
+            sub: user.id,
+          },
+          {
+            expiresIn: '30d',
+            secret: process.env.JWT_SECRET + user.password,
+          },
+        );
     return {
       tokens: { accessToken: accessToken, refreshToken: refreshToken },
       authenticatedUser: user,
     };
+  }
+  async refreshSession(refreshTokenDto: RefreshTokenDto) {
+    const decodedToken = (await this.jwtService.decode(
+      refreshTokenDto.refreshToken,
+    )) as any;
+    const user = await this.usersService.findOne(decodedToken.sub);
+    if (!user) {
+      throw new UnauthorizedException('Invalid user');
+    }
+    const secretKey = 'Heldsansasc' + user.password;
+    const isValidRefreshToken = await this.jwtService.verify(
+      refreshTokenDto.refreshToken,
+      {
+        secret: secretKey,
+      },
+    );
+    if (!isValidRefreshToken) {
+      throw new UnauthorizedException('Invalid token');
+    }
+    return this.generateTokens(user, refreshTokenDto.refreshToken);
   }
 }

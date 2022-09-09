@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import { LoginEmailDto } from './dto/login-email.dto';
 import { RegisterEmailDto } from './dto/register-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('Authentication & Authorization')
 @Controller({
@@ -44,15 +45,13 @@ export class AuthController {
     return this.authService.registerWithEmail(registerEmailDto);
   }
 
+  @Public()
   @Post('refresh')
   @ApiOperation({
-    summary: 'Refresh the access token',
+    summary: 'Get a new access token with the refresh token',
   })
-  async refreshSession(
-    @CurrentUser() user: User,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.authService.updateUser(user, updateUserDto);
+  async refreshSession(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshSession(refreshTokenDto);
   }
 
   @Get('user')
