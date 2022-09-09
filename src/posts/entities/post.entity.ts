@@ -39,7 +39,7 @@ export class Post {
   @Column({ length: 100, type: 'varchar' })
   image: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   author: User;
 
   @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts, {

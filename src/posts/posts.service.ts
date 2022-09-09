@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
@@ -38,13 +38,14 @@ export class PostsService {
         this.hashtagsService.preloadHashtagByName(name.toLowerCase()),
       ),
     );
+    const user = await this.usersService.findOne(author.id);
     const post = this.postsRepository.create({
       ...createPostDto,
       slug:
         createPostDto.title.replace(/\s/g, '-').toLowerCase() +
         '-' +
         Math.random().toString(36).substring(2, 7),
-      author: author,
+      author: user,
       metadata: {
         views: 0,
         shares: 0,
@@ -61,11 +62,30 @@ export class PostsService {
    * passed to the paginate function.
    * @returns A promise of a pagination object.
    */
-  findAll(options: IPaginationOptions): Promise<Pagination<Post>> {
-    return paginate<Post>(this.postsRepository, options, {
-      where: { status: PostStatus.DRAFT },
-      relations: ['author', 'hashtags', 'metadata'],
-    });
+  async findAll(
+    options: IPaginationOptions,
+    authorId?: number,
+    hashtag?: string,
+  ): Promise<Pagination<Post>> {
+    const query: FindManyOptions<Post> = {
+      relations: {
+        author: true,
+        hashtags: true,
+      },
+      where: {
+        status: PostStatus.DRAFT,
+      } as FindOptionsWhere<Post>,
+      order: {
+        createdAt: 'DESC',
+      },
+    };
+    if (authorId) {
+      query.where['author'] = { id: authorId };
+    }
+    if (hashtag) {
+      query.where['hashtags'] = { name: hashtag };
+    }
+    return paginate<Post>(this.postsRepository, options, query);
   }
 
   async findAllByAuthor(authorId: number): Promise<Post[]> {

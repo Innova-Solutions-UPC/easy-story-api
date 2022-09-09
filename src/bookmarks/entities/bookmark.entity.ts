@@ -16,9 +16,6 @@ export class Bookmark {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'text', default: '' })
-  note: string;
-
   @ManyToOne(() => User, {
     nullable: false,
     onDelete: 'CASCADE',

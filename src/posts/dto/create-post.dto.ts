@@ -1,4 +1,4 @@
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsString, IsUrl } from 'class-validator';
 import { PostStatus } from '../enums/post-status.enum';
 
 export class CreatePostDto {
@@ -14,7 +14,7 @@ export class CreatePostDto {
   @IsString()
   content: string;
 
-  @IsString()
+  @IsUrl()
   image: string;
 
   @IsString({ each: true })

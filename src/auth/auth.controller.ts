@@ -44,6 +44,17 @@ export class AuthController {
     return this.authService.registerWithEmail(registerEmailDto);
   }
 
+  @Post('refresh')
+  @ApiOperation({
+    summary: 'Refresh the access token',
+  })
+  async refreshSession(
+    @CurrentUser() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.authService.updateUser(user, updateUserDto);
+  }
+
   @Get('user')
   @ApiOperation({
     summary: 'Get the current authenticated user',

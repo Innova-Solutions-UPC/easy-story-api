@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
@@ -18,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    CacheModule.register(),
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 10,
