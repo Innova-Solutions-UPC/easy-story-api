@@ -44,6 +44,7 @@ export class Post {
 
   @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts, {
     cascade: true,
+    eager: true,
   })
   @JoinTable({
     name: 'posts_hashtags',

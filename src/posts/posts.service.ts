@@ -66,6 +66,7 @@ export class PostsService {
     options: IPaginationOptions,
     authorId?: number,
     hashtag?: string,
+    currentUser?: User,
   ): Promise<Pagination<Post>> {
     const query: FindManyOptions<Post> = {
       relations: {
@@ -84,6 +85,9 @@ export class PostsService {
     }
     if (hashtag) {
       query.where['hashtags'] = { name: hashtag };
+    }
+    if (currentUser && authorId && currentUser.id === authorId) {
+      query.where['status'] = [PostStatus.PUBLISHED, PostStatus.DRAFT];
     }
     return paginate<Post>(this.postsRepository, options, query);
   }

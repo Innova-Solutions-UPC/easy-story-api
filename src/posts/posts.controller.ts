@@ -61,6 +61,7 @@ export class PostsController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
     @Query('author') author?: string,
     @Query('hashtag') hashtag?: string,
+    @CurrentUser() user?: User,
   ) {
     return this.postsService.findAll(
       {
@@ -70,6 +71,7 @@ export class PostsController {
       },
       +author,
       hashtag,
+      user,
     );
   }
 

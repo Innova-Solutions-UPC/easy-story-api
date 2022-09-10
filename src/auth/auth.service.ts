@@ -111,7 +111,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid user');
     }
-    const secretKey = 'Heldsansasc' + user.password;
+    const secretKey = 'djkwd2M4bmptbXQ4d3BoY2J0d' + user.password;
     const isValidRefreshToken = await this.jwtService.verify(
       refreshTokenDto.refreshToken,
       {
