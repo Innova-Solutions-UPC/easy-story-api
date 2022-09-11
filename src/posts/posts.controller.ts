@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Req,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -61,7 +62,6 @@ export class PostsController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
     @Query('author') author?: string,
     @Query('hashtag') hashtag?: string,
-    @CurrentUser() user?: User,
   ) {
     return this.postsService.findAll(
       {
@@ -70,6 +70,32 @@ export class PostsController {
         route: '/v1/posts',
       },
       +author,
+      hashtag,
+      null,
+    );
+  }
+
+  @Get('user')
+  @ApiOperation({ summary: 'Retrieve all posts by the authenticated user' })
+  @ApiQuery({
+    name: 'hashtag',
+    required: false,
+    type: String,
+    description: 'The hashtag name',
+  })
+  findAllByCurrentUser(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
+    @CurrentUser() user: User,
+    @Query('hashtag') hashtag?: string,
+  ) {
+    return this.postsService.findAll(
+      {
+        page,
+        limit,
+        route: '/v1/posts',
+      },
+      null,
       hashtag,
       user,
     );
