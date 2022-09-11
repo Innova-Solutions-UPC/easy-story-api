@@ -29,20 +29,19 @@ import { Public } from '../common/public.decorator';
 @ApiBearerAuth()
 @ApiTags('Posts')
 @Controller({
-  path: 'posts',
   version: '1',
 })
 @UseInterceptors(ClassSerializerInterceptor)
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Post()
+  @Post('posts')
   @ApiOperation({ summary: 'Create a new post' })
   create(@CurrentUser() user: User, @Body() createPostDto: CreatePostDto) {
     return this.postsService.create(user, createPostDto);
   }
 
-  @Get()
+  @Get('posts')
   @Public()
   @ApiOperation({ summary: 'Retrieve all posts' })
   @ApiQuery({
@@ -75,7 +74,7 @@ export class PostsController {
     );
   }
 
-  @Get('user')
+  @Get('user-posts')
   @ApiOperation({ summary: 'Retrieve all posts by the authenticated user' })
   @ApiQuery({
     name: 'hashtag',
@@ -101,13 +100,13 @@ export class PostsController {
     );
   }
 
-  @Get(':slug')
+  @Get('posts/:slug')
   @ApiOperation({ summary: 'Get a post by slug' })
   findOneBySlug(@Param('slug') slug: string) {
     return this.postsService.findOneBySlug(slug);
   }
 
-  @Patch(':id')
+  @Patch('posts/:id')
   @ApiOperation({ summary: 'Update a post' })
   update(
     @Param('id') id: string,
@@ -118,13 +117,13 @@ export class PostsController {
   }
 
   @Public()
-  @Patch(':id/metadata')
+  @Patch('posts/:id/metadata')
   @ApiOperation({ summary: 'Post metadata' })
   updateMetadata(@Param('id') id: string, @Query('action') action: string) {
     return this.postsService.updateMetadata(+id, action);
   }
 
-  @Delete(':id')
+  @Delete('posts/:id')
   @ApiOperation({ summary: 'Delete a post' })
   remove(@Param('id') id: string, @CurrentUser() user: User) {
     return this.postsService.remove(+id, user);
