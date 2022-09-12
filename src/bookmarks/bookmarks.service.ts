@@ -68,7 +68,7 @@ export class BookmarksService {
       },
     };
     if (postSlug) {
-      query.where['post'] = { slug: +postSlug };
+      query.where['post'] = { slug: postSlug };
     }
     return paginate<Bookmark>(this.bookmarksRepository, options, query);
   }
