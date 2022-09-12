@@ -28,27 +28,27 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post('/posts/:postId/comments')
+  @Post('/posts/:slug/comments')
   @ApiOperation({ summary: 'Create a new comment on a post' })
   create(
-    @Param('postId') postId: string,
+    @Param('slug') slug: string,
     @CurrentUser() user: User,
     @Body() createCommentDto: CreateCommentDto,
   ) {
-    return this.commentsService.create(user, +postId, createCommentDto);
+    return this.commentsService.create(user, slug, createCommentDto);
   }
 
-  @Get('/posts/:postId/comments')
+  @Get('/posts/:slug/comments')
   @ApiOperation({ summary: 'Get all comments in a post' })
   findAllByPost(
-    @Param('postId') postId: string,
+    @Param('slug') slug: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
   ) {
-    return this.commentsService.findAllByPost(+postId, {
+    return this.commentsService.findAllByPost(slug, {
       page,
       limit,
-      route: `/v1/posts/${postId}/comments`,
+      route: `/v1/posts/${slug}/comments`,
     });
   }
 

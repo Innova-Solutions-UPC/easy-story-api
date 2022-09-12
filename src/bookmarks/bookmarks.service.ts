@@ -57,7 +57,7 @@ export class BookmarksService {
   findAll(
     options: IPaginationOptions,
     currentUser: User,
-    postId?: string,
+    postSlug?: string,
   ): Promise<Pagination<Bookmark>> {
     const query: FindManyOptions<Bookmark> = {
       where: {
@@ -67,8 +67,8 @@ export class BookmarksService {
         createdAt: 'DESC',
       },
     };
-    if (postId) {
-      query.where['post'] = { id: +postId };
+    if (postSlug) {
+      query.where['post'] = { slug: +postSlug };
     }
     return paginate<Bookmark>(this.bookmarksRepository, options, query);
   }

@@ -118,7 +118,7 @@ export class PostsService {
   async findOneBySlug(slug: string): Promise<Post> {
     const post = await this.postsRepository.findOneBy({ slug });
     if (!post) {
-      throw new NotFoundException('Post #${id} not found');
+      throw new NotFoundException('Post not found');
     }
     return post;
   }

@@ -30,10 +30,10 @@ export class CommentsService {
    */
   async create(
     user: User,
-    postId: number,
+    postSlug: string,
     createCommentDto: CreateCommentDto,
   ): Promise<Comment> {
-    const post = await this.postsService.findOne(postId);
+    const post = await this.postsService.findOneBySlug(postSlug);
     if (post.status == PostStatus.PUBLISHED) {
       throw new BadRequestException('You cannot comment on a draft post');
     }
@@ -55,10 +55,10 @@ export class CommentsService {
    * @returns A paginated list of comments for a given post.
    */
   async findAllByPost(
-    postId: number,
+    postSlug: string,
     options: IPaginationOptions,
   ): Promise<Pagination<Comment>> {
-    const post = await this.postsService.findOne(postId);
+    const post = await this.postsService.findOneBySlug(postSlug);
     return paginate<Comment>(this.commentsRepository, options, {
       post: post,
       relations: ['user'],
