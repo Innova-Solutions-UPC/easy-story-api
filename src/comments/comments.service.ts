@@ -60,8 +60,12 @@ export class CommentsService {
   ): Promise<Pagination<Comment>> {
     const post = await this.postsService.findOneBySlug(postSlug);
     return paginate<Comment>(this.commentsRepository, options, {
-      post: post,
-      relations: ['user'],
+      post: {
+        id: post.id,
+      },
+      relations: {
+        user: true,
+      },
     });
   }
 

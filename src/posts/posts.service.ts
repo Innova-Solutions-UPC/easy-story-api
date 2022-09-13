@@ -38,7 +38,7 @@ export class PostsService {
         this.hashtagsService.preloadHashtagByName(name.toLowerCase()),
       ),
     );
-    const user = await this.usersService.findOne(author.id);
+    const user = await this.usersService.findOne(author.username);
     const post = this.postsRepository.create({
       ...createPostDto,
       slug:
@@ -92,9 +92,15 @@ export class PostsService {
     return paginate<Post>(this.postsRepository, options, query);
   }
 
-  async findAllByAuthor(authorId: number): Promise<Post[]> {
-    const author = await this.usersService.findOne(authorId);
-    return this.postsRepository.find({ where: { author } });
+  async findAllByAuthor(authorUsername: string): Promise<Post[]> {
+    const author = await this.usersService.findOne(authorUsername);
+    return this.postsRepository.find({
+      where: {
+        author: {
+          id: author.id,
+        },
+      },
+    });
   }
 
   /**
@@ -136,7 +142,12 @@ export class PostsService {
     updatePostDto: UpdatePostDto,
   ): Promise<Post> {
     const userIsAuthor = await this.postsRepository.findOne({
-      where: { id, author: user },
+      where: {
+        id,
+        author: {
+          id: user.id,
+        },
+      },
       relations: ['author'],
     });
     if (!userIsAuthor) {

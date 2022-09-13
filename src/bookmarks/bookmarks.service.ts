@@ -33,7 +33,9 @@ export class BookmarksService {
       throw new BadRequestException('You can only bookmark your own posts');
     }
     const existingBookmark = await this.bookmarksRepository.findOneBy({
-      user,
+      user: {
+        id: user.id,
+      },
       post: { id: +createBookmarkDto.post },
     });
     if (existingBookmark) {
@@ -61,7 +63,9 @@ export class BookmarksService {
   ): Promise<Pagination<Bookmark>> {
     const query: FindManyOptions<Bookmark> = {
       where: {
-        user: currentUser,
+        user: {
+          id: currentUser.id,
+        },
       },
       order: {
         createdAt: 'DESC',

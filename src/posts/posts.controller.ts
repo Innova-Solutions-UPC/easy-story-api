@@ -25,7 +25,6 @@ import { CurrentUser } from '../common/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Public } from '../common/public.decorator';
 
-@ApiBearerAuth()
 @ApiTags('Posts')
 @Controller({
   version: '1',
@@ -35,6 +34,7 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post('posts')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new post' })
   create(@CurrentUser() user: User, @Body() createPostDto: CreatePostDto) {
     return this.postsService.create(user, createPostDto);
@@ -74,6 +74,7 @@ export class PostsController {
   }
 
   @Get('user-posts')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Retrieve all posts by the authenticated user' })
   @ApiQuery({
     name: 'hashtag',
@@ -106,6 +107,7 @@ export class PostsController {
   }
 
   @Patch('posts/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a post' })
   update(
     @Param('id') id: string,
@@ -123,6 +125,7 @@ export class PostsController {
   }
 
   @Delete('posts/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a post' })
   remove(@Param('id') id: string, @CurrentUser() user: User) {
     return this.postsService.remove(+id, user);

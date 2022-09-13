@@ -23,12 +23,12 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 @Controller({
   version: '1',
 })
-@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post('/posts/:slug/comments')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new comment on a post' })
   create(
     @Param('slug') slug: string,
@@ -59,6 +59,7 @@ export class CommentsController {
   }
 
   @Patch('/comments/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a comment' })
   update(
     @Param('id') id: string,
@@ -69,6 +70,7 @@ export class CommentsController {
   }
 
   @Delete('/comments/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a comment' })
   remove(@Param('id') id: string, @CurrentUser() user: User) {
     return this.commentsService.remove(+id, user);

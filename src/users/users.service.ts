@@ -35,12 +35,10 @@ export class UsersService {
       throw new BadRequestException('Email is already in use');
     }
     const user = this.usersRepository.create({
+      ...createUserDto,
       email: createUserDto.email.toLowerCase(),
-      firstName: createUserDto.firstName,
-      lastName: createUserDto.lastName,
-      username: createUserDto.username,
-      verified: true,
-      password: await argon2.hash(createUserDto.password),
+      username: createUserDto.username.toLocaleLowerCase(),
+      verified: false,
     });
     return this.usersRepository.save(user);
   }
@@ -59,10 +57,10 @@ export class UsersService {
    * @param {number} id - number - the id of the user we want to find
    * @returns The user object
    */
-  async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+  async findOne(username: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ username });
     if (!user) {
-      throw new BadRequestException(`User number #${id} not found`);
+      throw new BadRequestException(`User not found`);
     }
     return user;
   }
@@ -83,13 +81,13 @@ export class UsersService {
    * @param {UpdateUserDto} updateUserDto - UpdateUserDto
    * @returns The user object
    */
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(username: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.preload({
-      id: id,
       ...updateUserDto,
+      username: username,
     });
     if (!user) {
-      throw new BadRequestException(`User number #${id} not found`);
+      throw new BadRequestException(`User number #${username} not found`);
     }
     return this.usersRepository.save(user);
   }
@@ -99,8 +97,8 @@ export class UsersService {
    * @param {number} id - number - the id of the user we want to remove
    * @returns The user that was removed.
    */
-  async remove(id: number): Promise<User> {
-    const user = await this.findOne(id);
+  async remove(username: string): Promise<User> {
+    const user = await this.findOne(username);
     return this.usersRepository.remove(user);
   }
 }

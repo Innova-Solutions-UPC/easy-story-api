@@ -52,7 +52,7 @@ export class AuthService {
    * @returns A promise of a user.
    */
   changePassword(user: User, newPassword: string): Promise<User> {
-    return this.usersService.update(user.id, { password: newPassword });
+    return this.usersService.update(user.username, { password: newPassword });
   }
 
   /**
@@ -62,7 +62,7 @@ export class AuthService {
    * @returns The updated user
    */
   updateUser(user: User, updateUserDto): Promise<User> {
-    return this.usersService.update(user.id, { ...updateUserDto });
+    return this.usersService.update(user.username, { ...updateUserDto });
   }
 
   /**
@@ -71,7 +71,7 @@ export class AuthService {
    * @returns A promise of a user object.
    */
   async getCurrentUser(currentUser: User) {
-    const user = await this.usersService.findOne(currentUser.id);
+    const user = await this.usersService.findOne(currentUser.username);
     return { authenticatedUser: user };
   }
 
@@ -90,6 +90,7 @@ export class AuthService {
       ? refreshJwt
       : this.jwtService.sign(
           {
+            username: user.username,
             email: user.email,
             sub: user.id,
           },

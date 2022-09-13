@@ -24,4 +24,7 @@ export class RegisterEmailDto {
 
   @IsString()
   lastName: string;
+
+  @IsString()
+  bio: string;
 }
