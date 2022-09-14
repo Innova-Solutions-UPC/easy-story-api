@@ -122,7 +122,10 @@ export class PostsService {
    * @returns A post object
    */
   async findOneBySlug(slug: string): Promise<Post> {
-    const post = await this.postsRepository.findOneBy({ slug });
+    const post = await this.postsRepository.findOneBy({
+      slug,
+      status: PostStatus.PUBLISHED,
+    });
     if (!post) {
       throw new NotFoundException('Post not found');
     }

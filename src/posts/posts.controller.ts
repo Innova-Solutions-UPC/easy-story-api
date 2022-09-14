@@ -100,6 +100,7 @@ export class PostsController {
     );
   }
 
+  @Public()
   @Get('posts/:slug')
   @ApiOperation({ summary: 'Get a post by slug' })
   findOneBySlug(@Param('slug') slug: string) {

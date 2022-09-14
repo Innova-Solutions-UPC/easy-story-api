@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/common/public.decorator';
 
 @ApiBearerAuth()
 @ApiTags('User Management')
@@ -44,6 +45,7 @@ export class UsersController {
     });
   }
 
+  @Public()
   @Get(':username')
   findOne(@Param('username') username: string) {
     return this.usersService.findOne(username);

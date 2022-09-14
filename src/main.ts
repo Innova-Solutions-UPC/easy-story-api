@@ -32,8 +32,9 @@ async function bootstrap() {
   /* Creating a swagger document. */
   const config = new DocumentBuilder()
     .setTitle('Easy Story API')
-    .setDescription('The cats API description')
+    .setDescription('REST API made with NestJS')
     .setVersion('1.0')
+    .setContact('Marco Manrique Acha', 'https://github.com/MarcoMnrq/', '')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
