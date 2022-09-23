@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
@@ -64,7 +64,7 @@ export class PostsService {
    */
   async findAll(
     options: IPaginationOptions,
-    authorId?: number,
+    author?: string,
     hashtag?: string,
     currentUser?: User,
   ): Promise<Pagination<Post>> {
@@ -80,14 +80,45 @@ export class PostsService {
         createdAt: 'DESC',
       },
     };
-    if (authorId) {
-      query.where['author'] = { id: authorId };
+    if (author) {
+      query.where['author'] = { username: author };
     }
     if (hashtag) {
       query.where['hashtags'] = { name: hashtag };
     }
     if (currentUser) {
       delete query.where['status'];
+      query.where['author'] = { username: currentUser.username };
+    }
+    return paginate<Post>(this.postsRepository, options, query);
+  }
+  /**
+   * It returns a promise of a paginated list of posts, where the posts are filtered by status, and the
+   * relations are eager loaded
+   * @param {IPaginationOptions} options - IPaginationOptions - This is the options object that is
+   * passed to the paginate function.
+   * @returns A promise of a pagination object.
+   */
+  async search(
+    options: IPaginationOptions,
+    title: string,
+    country?: string,
+  ): Promise<Pagination<Post>> {
+    const query: FindManyOptions<Post> = {
+      relations: {
+        author: true,
+        hashtags: true,
+      },
+      where: {
+        status: PostStatus.PUBLISHED,
+        title: Like(`%${title}%`),
+      } as FindOptionsWhere<Post>,
+      order: {
+        createdAt: 'DESC',
+      },
+    };
+    if (country) {
+      query.where['author.country'] = country;
     }
     return paginate<Post>(this.postsRepository, options, query);
   }

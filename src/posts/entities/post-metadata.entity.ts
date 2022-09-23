@@ -20,7 +20,9 @@ export class PostMetadata {
   @Column('int', { default: 0 })
   shares: number;
 
-  @OneToOne(() => Post)
+  @OneToOne(() => Post, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   post: Post;
 }

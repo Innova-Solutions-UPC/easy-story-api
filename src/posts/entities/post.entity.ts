@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -21,16 +22,18 @@ export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ length: 100, type: 'varchar' })
   title: string;
 
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.DRAFT })
   status: PostStatus;
 
+  @Index()
   @Column({ length: 100, type: 'varchar', unique: true })
   slug: string;
 
-  @Column({ length: 100, type: 'varchar' })
+  @Column({ length: 250, type: 'varchar' })
   description: string;
 
   @Column({ length: 100, type: 'varchar' })

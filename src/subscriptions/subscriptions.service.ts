@@ -90,10 +90,16 @@ export class SubscriptionsService {
     });
   }
 
-  remove(userUsername: string, subscriber: User) {
-    return this.subscriptionsRepository.delete({
-      user: { username: userUsername },
-      subscriber: { id: subscriber.id },
-    });
+  async remove(userUsername: string, subscriber: User) {
+    const subscription = await this.findOneByUserAndSubscriber(
+      userUsername,
+      subscriber,
+    );
+    if (!subscription) {
+      throw new BadRequestException(
+        'You are not subscribed to this user. You cannot unsubscribe.',
+      );
+    }
+    return this.subscriptionsRepository.remove(subscription);
   }
 }

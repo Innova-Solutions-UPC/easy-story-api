@@ -67,13 +67,39 @@ export class PostsController {
         limit,
         route: '/v1/posts',
       },
-      +author,
+      author,
       hashtag,
       null,
     );
   }
 
-  @Get('user-posts')
+  @Get('posts-search')
+  @Public()
+  @ApiOperation({ summary: 'Search for posts' })
+  @ApiQuery({
+    name: 'country',
+    required: false,
+    type: String,
+    description: 'The country',
+  })
+  search(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
+    @Query('title') title: string,
+    @Query('country') country?: string,
+  ) {
+    return this.postsService.search(
+      {
+        page,
+        limit,
+        route: '/v1/posts',
+      },
+      title,
+      country,
+    );
+  }
+
+  @Get('my-posts')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Retrieve all posts by the authenticated user' })
   @ApiQuery({
