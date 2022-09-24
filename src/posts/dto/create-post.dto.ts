@@ -1,4 +1,10 @@
-import { IsEnum, IsString, IsUrl } from 'class-validator';
+import {
+  IsArray,
+  IsDecimal,
+  IsEnum,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { PostStatus } from '../enums/post-status.enum';
 
 export class CreatePostDto {
@@ -14,9 +20,23 @@ export class CreatePostDto {
   @IsString()
   content: string;
 
-  @IsUrl()
-  image: string;
+  @IsArray()
+  gallery: AssignAssetDto[];
+
+  @IsDecimal()
+  pricingValue: number;
+
+  @IsString()
+  pricingCurrency: string;
+
+  @IsString()
+  pricingDescription: string;
 
   @IsString({ each: true })
   hashtags: string[];
+}
+
+export class AssignAssetDto {
+  @IsNumber()
+  id: string;
 }

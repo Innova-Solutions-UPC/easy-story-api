@@ -42,8 +42,20 @@ export class Post {
   @Column({ length: 100, type: 'varchar' })
   image: string;
 
+  @Column({ default: 0 })
+  priority: number;
+
   @ManyToOne(() => User, { eager: true })
   author: User;
+
+  @Column({ default: 0 })
+  pricingValue: number;
+
+  @Column({ default: '' })
+  pricingCurrency: string;
+
+  @Column({ default: '' })
+  pricingDescription: string;
 
   @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts, {
     cascade: true,

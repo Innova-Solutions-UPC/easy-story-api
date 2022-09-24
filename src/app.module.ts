@@ -15,6 +15,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AssetsModule } from './assets/assets.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AssetsModule } from './assets/assets.module';
         entityPrefix: 'ds_',
       }),
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
     AssetsModule,

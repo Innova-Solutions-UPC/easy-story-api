@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from '../users/users.service';
@@ -13,9 +13,14 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { PostStatus } from './enums/post-status.enum';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class PostsService {
+  /* It's creating a new logger instance, and it's using the name of the class as the name of the
+  logger. */
+  private readonly logger = new Logger(PostsService.name);
+
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
@@ -46,11 +51,11 @@ export class PostsService {
         '-' +
         Math.random().toString(36).substring(2, 7),
       author: user,
+      hashtags,
       metadata: {
         views: 0,
         shares: 0,
       },
-      hashtags,
     });
     return this.postsRepository.save(post);
   }
@@ -111,7 +116,7 @@ export class PostsService {
       },
       where: {
         status: PostStatus.PUBLISHED,
-        title: Like(`%${title}%`),
+        title: Like(`%${title.toLowerCase()}%`),
       } as FindOptionsWhere<Post>,
       order: {
         createdAt: 'DESC',
@@ -197,7 +202,10 @@ export class PostsService {
     const post = await this.postsRepository.preload({
       id: id,
       author: user,
-      ...updatePostDto,
+      title: updatePostDto.title,
+      content: updatePostDto.content,
+      status: updatePostDto.status,
+      // pricing: updatePostDto.pricing,
       hashtags,
     });
     if (!post) {
@@ -235,5 +243,13 @@ export class PostsService {
       throw new NotFoundException('You are not the author of this post');
     }
     return this.postsRepository.remove(post);
+  }
+
+  @Cron('45 * * * * *')
+  async handleDynamicList() {
+    this.logger.log('Updating dynamic list of Posts');
+    const posts = await this.postsRepository.find();
+    this.logger.log(`Finished updating list, found ${posts.length} posts`);
+    return posts;
   }
 }

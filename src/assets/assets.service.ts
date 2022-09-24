@@ -98,12 +98,16 @@ export class AssetsService {
   }
 
   /**
-   * It finds an asset by its id and returns it
-   * @param {string} id - string - The id of the asset we want to find.
-   * @returns A promise of an asset
+   * It finds an asset by its id and owner, and if it doesn't exist, it throws a BadRequestException
+   * @param {number} id - number - the id of the asset we want to preload
+   * @param {User} owner - User - this is the user that is currently logged in.
+   * @returns The asset
    */
-  async findOne(id: number): Promise<Asset> {
-    const asset = await this.assetsRepository.findOneBy({ id });
+  async preloadAssetByIdAndOwner(id: number, owner: User): Promise<Asset> {
+    const asset = await this.assetsRepository.findOneBy({
+      id,
+      owner: { id: owner.id },
+    });
     if (!asset) {
       throw new BadRequestException('Asset not found');
     }
