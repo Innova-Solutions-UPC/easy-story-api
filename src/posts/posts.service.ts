@@ -165,6 +165,9 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+    // update the views
+    post.metadata.views++;
+    await this.postsRepository.save(post);
     return post;
   }
 
@@ -182,7 +185,7 @@ export class PostsService {
   ): Promise<Post> {
     const userIsAuthor = await this.postsRepository.findOne({
       where: {
-        id,
+        id: id,
         author: {
           id: user.id,
         },
