@@ -47,6 +47,7 @@
     "commitizen": "^4.2.5",
     "cz-conventional-changelog": "^3.3.0",
     "helmet": "^6.0.0",
+    "iso-3166-1": "^2.1.1",
     "joi": "^17.6.0",
     "nestjs-typeorm-paginate": "^4.0.2",
     "passport": "^0.6.0",

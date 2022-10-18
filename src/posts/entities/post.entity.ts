@@ -7,6 +7,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -14,6 +15,7 @@ import {
 import { PostMetadata } from './post-metadata.entity';
 import { Hashtag } from '../../hashtags/entities/hashtag.entity';
 import { PostStatus } from '../enums/post-status.enum';
+import { PostAsset } from './post-asset.entity';
 
 @Entity({
   name: 'posts',
@@ -36,11 +38,8 @@ export class Post {
   @Column({ length: 250, type: 'varchar' })
   description: string;
 
-  @Column({ length: 100, type: 'varchar' })
+  @Column({ type: 'text' })
   content: string;
-
-  @Column({ length: 100, type: 'varchar' })
-  image: string;
 
   @Column({ default: 0 })
   priority: number;
@@ -57,6 +56,9 @@ export class Post {
   @Column({ default: '' })
   pricingDescription: string;
 
+  @OneToMany(() => PostAsset, (asset) => asset.post, { eager: true })
+  assets: PostAsset[];
+
   @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts, {
     cascade: true,
     eager: true,
@@ -68,6 +70,7 @@ export class Post {
 
   @OneToOne(() => PostMetadata, (metadata) => metadata.post, {
     cascade: true,
+    eager: true,
   })
   metadata: PostMetadata;
 

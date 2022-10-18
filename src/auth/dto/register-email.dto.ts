@@ -1,6 +1,7 @@
 import {
   IsAlphanumeric,
   IsEmail,
+  IsISO31661Alpha3,
   IsLowercase,
   IsString,
   Length,
@@ -27,4 +28,7 @@ export class RegisterEmailDto {
 
   @IsString()
   bio: string;
+
+  @IsISO31661Alpha3()
+  country: string;
 }

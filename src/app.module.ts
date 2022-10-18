@@ -14,7 +14,6 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { AssetsModule } from './assets/assets.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -37,7 +36,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
-    AssetsModule,
     PostsModule,
     CommentsModule,
     BookmarksModule,

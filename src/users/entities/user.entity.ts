@@ -36,6 +36,9 @@ export class User {
   @Column({ length: 250, type: 'varchar', default: '' })
   bio: string;
 
+  @Column({ default: 'PER' })
+  country: string;
+
   @Column({ default: false, type: 'boolean' })
   verified: boolean;
 

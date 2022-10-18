@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   UseInterceptors,
   ClassSerializerInterceptor,
+  UploadedFile,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -18,12 +19,14 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../common/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Public } from '../common/public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Posts')
 @Controller({
@@ -144,11 +147,15 @@ export class PostsController {
     return this.postsService.update(+id, user, updatePostDto);
   }
 
-  @Public()
-  @Patch('posts/:id/metadata')
-  @ApiOperation({ summary: 'Post metadata' })
-  updateMetadata(@Param('id') id: string, @Query('action') action: string) {
-    return this.postsService.updateMetadata(+id, action);
+  @Post('post-assets/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBearerAuth()
+  @ApiParam({ name: 'file', type: 'file' })
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ) {
+    return this.postsService.uploadFile(file, user);
   }
 
   @Delete('posts/:id')

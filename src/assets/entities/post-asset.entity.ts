@@ -1,15 +1,22 @@
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { AssetType } from '../enums/asset-type.enum';
 
 @Entity({
   name: 'assets',
 })
-export class Asset {
+export class PostAsset {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Index()
+  @Column({ unique: true })
   src: string;
 
   @Column()
@@ -17,6 +24,9 @@ export class Asset {
 
   @Column()
   type: AssetType;
+
+  @Column({ default: 0 })
+  size: number;
 
   @Column()
   mimetype: string;

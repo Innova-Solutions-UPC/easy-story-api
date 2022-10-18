@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from '../users/users.service';
@@ -14,6 +19,9 @@ import {
 } from 'nestjs-typeorm-paginate';
 import { PostStatus } from './enums/post-status.enum';
 import { Cron } from '@nestjs/schedule';
+import { PostAsset } from './entities/post-asset.entity';
+import { Credentials, Endpoint, S3 } from 'aws-sdk';
+import { PostAssetType } from './enums/post-asset-type.enum';
 
 @Injectable()
 export class PostsService {
@@ -24,6 +32,8 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
+    @InjectRepository(PostAsset)
+    private readonly postAssetsRepository: Repository<PostAsset>,
     private readonly usersService: UsersService,
     private readonly hashtagsService: HashtagsService,
   ) {}
@@ -44,14 +54,20 @@ export class PostsService {
       ),
     );
     const user = await this.usersService.findOne(author.username);
+    const assets = await Promise.all(
+      createPostDto.assets.map((asset) =>
+        this.preloadAssetBySrcAndOwner(asset.src, author),
+      ),
+    );
     const post = this.postsRepository.create({
       ...createPostDto,
       slug:
-        createPostDto.title.replace(/\s/g, '-').toLowerCase() +
+        createPostDto.title.replace(/\s/g, '-') +
         '-' +
         Math.random().toString(36).substring(2, 7),
       author: user,
-      hashtags,
+      hashtags: hashtags,
+      assets: assets,
       metadata: {
         views: 0,
         shares: 0,
@@ -128,15 +144,24 @@ export class PostsService {
     return paginate<Post>(this.postsRepository, options, query);
   }
 
-  async findAllByAuthor(authorUsername: string): Promise<Post[]> {
-    const author = await this.usersService.findOne(authorUsername);
-    return this.postsRepository.find({
-      where: {
-        author: {
-          id: author.id,
-        },
-      },
+  /**
+   * It finds a PostAsset by its src and owner
+   * @param {string} src - The source of the asset.
+   * @param {User} owner - User - the user who owns the asset
+   * @returns A PostAsset object
+   */
+  async preloadAssetBySrcAndOwner(
+    src: string,
+    owner: User,
+  ): Promise<PostAsset> {
+    const asset = await this.postAssetsRepository.findOne({
+      where: { src: src, owner: { id: owner.id } },
     });
+    console.log(asset);
+    if (!asset) {
+      throw new NotFoundException(`Asset ${src} not found`);
+    }
+    return asset;
   }
 
   /**
@@ -165,7 +190,7 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    // update the views
+    /* It's updating the views of the post. */
     post.metadata.views++;
     await this.postsRepository.save(post);
     return post;
@@ -180,14 +205,14 @@ export class PostsService {
    */
   async update(
     id: number,
-    user: User,
+    author: User,
     updatePostDto: UpdatePostDto,
   ): Promise<Post> {
     const userIsAuthor = await this.postsRepository.findOne({
       where: {
         id: id,
         author: {
-          id: user.id,
+          id: author.id,
         },
       },
       relations: ['author'],
@@ -202,36 +227,102 @@ export class PostsService {
           this.hashtagsService.preloadHashtagByName(name.toLowerCase()),
         ),
       ));
+    const assets = await Promise.all(
+      updatePostDto.assets.map((asset) =>
+        this.preloadAssetBySrcAndOwner(asset.src, author),
+      ),
+    );
     const post = await this.postsRepository.preload({
       id: id,
-      author: user,
+      author: author,
       title: updatePostDto.title,
       content: updatePostDto.content,
       status: updatePostDto.status,
-      // pricing: updatePostDto.pricing,
-      hashtags,
+      hashtags: hashtags,
+      assets: assets,
     });
     if (!post) {
       throw new NotFoundException('Post #${id} not found');
     }
-
     return this.postsRepository.save(post);
   }
 
-  async updateMetadata(id: number, action: string): Promise<Post> {
-    // TODO: Add a check to see if the action is valid
-    const metadata = {};
-    if (action === 'view') {
-      metadata['views'] = () => 'views + 1';
+  /**
+   * It takes a file and an owner, and then uploads the file to Digital Ocean Spaces, and then creates
+   * an asset in the database
+   * @param file - Express.Multer.File - This is the file that was uploaded.
+   * @param {User} owner - User - This is the user who is uploading the file.
+   * @returns a promise of an asset.
+   */
+  async uploadFile(file: Express.Multer.File, owner: User): Promise<PostAsset> {
+    /* This is checking to make sure that the file is not null, that the file is not too big, and that
+    the file type is supported. */
+    if (!file) {
+      throw new BadRequestException('File is required');
     }
-    if (action === 'share') {
-      metadata['shares'] = () => 'shares + 1';
+    const fileSize = file.size / 1024 / 1024;
+    if (fileSize > 25) {
+      // 25 MB
+      throw new BadRequestException('File is too big');
     }
-    const post = await this.findOne(id);
-    return this.postsRepository.save({
-      ...post,
-      metadata,
+    if (
+      file.mimetype !== 'image/jpeg' &&
+      file.mimetype !== 'image/png' &&
+      file.mimetype !== 'image/webp' &&
+      file.mimetype !== 'media/mp4'
+    ) {
+      throw new BadRequestException('File type is not supported');
+    }
+    /* This is creating a new S3 object with the credentials and endpoint. */
+    const spaceEndPoint = new Endpoint(`${process.env.DO_SPACE_ENDPOINT}`);
+    const space = new S3({
+      endpoint: spaceEndPoint.href,
+      credentials: new Credentials({
+        accessKeyId: process.env.DO_SPACE_ACCESS_KEY_ID,
+        secretAccessKey: process.env.DO_SPACE_SECRET_ACCESS,
+      }),
     });
+    /* This is creating a new S3 object with the credentials and endpoint. */
+    const date_time = new Date();
+    file.originalname =
+      date_time.getUTCHours().toString() +
+      date_time.getUTCMinutes().toString() +
+      date_time.getUTCSeconds().toString() +
+      '-' +
+      file.originalname.replace(/\s/g, '_');
+    const fileName = `uploads/${date_time
+      .getUTCFullYear()
+      .toString()}/${date_time.getUTCMonth().toString()}/${date_time
+      .getUTCDay()
+      .toString()}/${file.originalname}`;
+    const params = {
+      Bucket: process.env.DO_SPACE_BUCKET_NAME,
+      Key: fileName,
+      Body: file.buffer,
+      ACL: 'public-read',
+      ContentType: file.mimetype,
+      UserMetadata: {
+        owner: owner.id,
+      },
+    };
+    /* This is a try catch block. It is trying to upload the file to Digital Ocean Spaces, and if it
+    fails, it throws an error. */
+    try {
+      const data = await space.upload(params).promise();
+      const asset = this.postAssetsRepository.create({
+        src: data.Location,
+        name: file.originalname,
+        size: file.size,
+        type: file.mimetype.includes('image')
+          ? PostAssetType.IMAGE
+          : PostAssetType.VIDEO,
+        mimetype: file.mimetype,
+        owner,
+      });
+      return this.postAssetsRepository.save(asset);
+    } catch (err) {
+      throw new BadRequestException('Error while uploading file');
+    }
   }
 
   /**

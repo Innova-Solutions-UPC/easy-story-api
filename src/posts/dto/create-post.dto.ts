@@ -1,13 +1,9 @@
-import {
-  IsArray,
-  IsDecimal,
-  IsEnum,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsArray, IsDecimal, IsEnum, IsString, IsUrl } from 'class-validator';
 import { PostStatus } from '../enums/post-status.enum';
 
 export class CreatePostDto {
+  @Transform(({ value }) => value.toUpperCamelCase())
   @IsString()
   title: string;
 
@@ -21,7 +17,7 @@ export class CreatePostDto {
   content: string;
 
   @IsArray()
-  gallery: AssignAssetDto[];
+  assets: AssignAssetDto[];
 
   @IsDecimal()
   pricingValue: number;
@@ -37,6 +33,6 @@ export class CreatePostDto {
 }
 
 export class AssignAssetDto {
-  @IsNumber()
-  id: string;
+  @IsUrl()
+  src: string;
 }

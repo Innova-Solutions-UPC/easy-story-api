@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Endpoint, S3, Credentials } from 'aws-sdk';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
-import { Asset } from './entities/asset.entity';
+import { PostAsset } from './entities/post-asset.entity';
 import { AssetType } from './enums/asset-type.enum';
 
 @Injectable()
 export class AssetsService {
   constructor(
-    @InjectRepository(Asset)
-    private readonly assetsRepository: Repository<Asset>,
+    @InjectRepository(PostAsset)
+    private readonly assetsRepository: Repository<PostAsset>,
   ) {}
 
   /**
@@ -20,13 +20,15 @@ export class AssetsService {
    * @param {User} owner - User - This is the user who is uploading the file.
    * @returns a promise of an asset.
    */
-  async uploadFile(file: Express.Multer.File, owner: User): Promise<Asset> {
+  async uploadFile(file: Express.Multer.File, owner: User): Promise<PostAsset> {
     /* This is checking to make sure that the file is not null, that the file is not too big, and that
     the file type is supported. */
     if (!file) {
       throw new BadRequestException('File is required');
     }
-    if (file.size > 1000000) {
+    const fileSize = file.size / 1024 / 1024;
+    if (fileSize > 25) {
+      // 25 MB
       throw new BadRequestException('File is too big');
     }
     if (
@@ -76,6 +78,7 @@ export class AssetsService {
       const asset = this.assetsRepository.create({
         src: data.Location,
         name: file.originalname,
+        size: file.size,
         type: file.mimetype.includes('image')
           ? AssetType.IMAGE
           : AssetType.VIDEO,
@@ -93,7 +96,7 @@ export class AssetsService {
    * @param {User} owner - User - this is the user object that we are passing in from the controller.
    * @returns An array of assets
    */
-  getUserAssets(owner: User): Promise<Asset[]> {
+  getUserAssets(owner: User): Promise<PostAsset[]> {
     return this.assetsRepository.find({ where: { owner: { id: owner.id } } });
   }
 
@@ -103,9 +106,25 @@ export class AssetsService {
    * @param {User} owner - User - this is the user that is currently logged in.
    * @returns The asset
    */
-  async preloadAssetByIdAndOwner(id: number, owner: User): Promise<Asset> {
+  async preloadAssetByIdAndOwner(id: number, owner: User) {
     const asset = await this.assetsRepository.findOneBy({
       id,
+      owner: { id: owner.id },
+    });
+    if (!asset) {
+      throw new BadRequestException('Asset not found');
+    }
+    return {
+      asset: asset,
+    };
+  }
+
+  async preloadAssetBySrcAndOwner(
+    src: string,
+    owner: User,
+  ): Promise<PostAsset> {
+    const asset = await this.assetsRepository.findOneBy({
+      src: src,
       owner: { id: owner.id },
     });
     if (!asset) {

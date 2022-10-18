@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsISO31661Alpha3, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -15,4 +15,10 @@ export class CreateUserDto {
 
   @IsString()
   lastName: string;
+
+  @IsString()
+  bio: string;
+
+  @IsISO31661Alpha3()
+  country: string;
 }

@@ -9,7 +9,6 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -82,13 +81,12 @@ export class UsersService {
    * @returns The user object
    */
   async update(username: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.usersRepository.preload({
-      ...updateUserDto,
-      username: username,
-    });
-    if (!user) {
-      throw new BadRequestException(`User number #${username} not found`);
-    }
+    const user = await this.findOne(username);
+    user.bio = updateUserDto.bio;
+    user.country = updateUserDto.country;
+    user.firstName = updateUserDto.firstName;
+    user.lastName = updateUserDto.lastName;
+    delete user.password;
     return this.usersRepository.save(user);
   }
 
