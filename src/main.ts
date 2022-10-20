@@ -18,7 +18,7 @@ async function bootstrap() {
   });
   /* Enabling CORS for the application. */
   app.enableCors({
-    origin: ['*'],
+    origin: '*',
     methods: 'GET,HEAD,PATCH,POST,DELETE,OPTIONS',
   });
   /* Configuring validation pipes */
