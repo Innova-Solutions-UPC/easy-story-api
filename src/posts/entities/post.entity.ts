@@ -33,10 +33,10 @@ export class Post {
   @Column({ length: 100, type: 'varchar' })
   description: string;
 
-  @Column({ length: 100, type: 'varchar' })
+  @Column({ length: 500, type: 'varchar' })
   content: string;
 
-  @Column({ length: 100, type: 'varchar' })
+  @Column({ length: 250, type: 'varchar' })
   image: string;
 
   @ManyToOne(() => User, { eager: true })
