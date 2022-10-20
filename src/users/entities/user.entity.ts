@@ -5,10 +5,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as argon2 from 'argon2';
+import { Profile } from 'src/profiles/entities/profile.entity';
 
 @Entity({
   name: 'users',
@@ -27,17 +30,12 @@ export class User {
   @Column({ length: 96, type: 'varchar' })
   password: string;
 
-  @Column({ length: 20, type: 'varchar' })
-  firstName: string;
-
-  @Column({ length: 20, type: 'varchar' })
-  lastName: string;
-
-  @Column({ length: 250, type: 'varchar', default: '' })
-  bio: string;
-
   @Column({ default: false, type: 'boolean' })
   verified: boolean;
+
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

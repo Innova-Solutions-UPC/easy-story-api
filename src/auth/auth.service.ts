@@ -5,7 +5,6 @@ import { LoginEmailDto } from './dto/login-email.dto';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { RegisterEmailDto } from './dto/register-email.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,10 +14,16 @@ export class AuthService {
   ) {}
 
   /**
-   * It takes a loginEmailDto object, finds a user by email, checks if the password is valid, and if
-   * so, returns a token
+   * We're using the findOneByEmail function from the UsersService to find a user by their email
+   * address. If the user doesn't exist, we throw an UnauthorizedException. If the user does exist, we
+   * use the argon2 library to verify the user's password. If the password is incorrect, we throw an
+   * UnauthorizedException. If the password is correct, we use the JWT service to sign a JWT token with
+   * the user's username, email, and id. We return the token and the user
    * @param {LoginEmailDto} loginEmailDto - LoginEmailDto
-   * @returns return this.generateTokens(user);
+   * @returns {
+   *     tokens: { accessToken: accessToken },
+   *     authenticatedUser: user,
+   *   }
    */
   async loginWithEmail(loginEmailDto: LoginEmailDto) {
     const user = await this.usersService.findOneByEmail(loginEmailDto.email);
@@ -32,7 +37,15 @@ export class AuthService {
     if (!isValidPassword) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return this.generateTokens(user);
+    const accessToken = this.jwtService.sign({
+      username: user.username,
+      email: user.email,
+      sub: user.id,
+    });
+    return {
+      tokens: { accessToken: accessToken },
+      authenticatedUser: user,
+    };
   }
 
   /**
@@ -73,55 +86,5 @@ export class AuthService {
   async getCurrentUser(currentUser: User) {
     const user = await this.usersService.findOne(currentUser.username);
     return { authenticatedUser: user };
-  }
-
-  /**
-   * It generates a JWT access token and a JWT refresh token
-   * @param {User} user - User - The user object that was returned from the database.
-   * @returns An object with the accessToken, refreshToken, and authenticatedUser.
-   */
-  generateTokens(user: User, refreshJwt?: string) {
-    const accessToken = this.jwtService.sign({
-      username: user.username,
-      email: user.email,
-      sub: user.id,
-    });
-    const refreshToken = refreshJwt
-      ? refreshJwt
-      : this.jwtService.sign(
-          {
-            username: user.username,
-            email: user.email,
-            sub: user.id,
-          },
-          {
-            expiresIn: '30d',
-            secret: process.env.JWT_SECRET + user.password,
-          },
-        );
-    return {
-      tokens: { accessToken: accessToken, refreshToken: refreshToken },
-      authenticatedUser: user,
-    };
-  }
-  async refreshSession(refreshTokenDto: RefreshTokenDto) {
-    const decodedToken = (await this.jwtService.decode(
-      refreshTokenDto.refreshToken,
-    )) as any;
-    const user = await this.usersService.findOne(decodedToken.sub);
-    if (!user) {
-      throw new UnauthorizedException('Invalid user');
-    }
-    const secretKey = 'djkwd2M4bmptbXQ4d3BoY2J0d' + user.password;
-    const isValidRefreshToken = await this.jwtService.verify(
-      refreshTokenDto.refreshToken,
-      {
-        secret: secretKey,
-      },
-    );
-    if (!isValidRefreshToken) {
-      throw new UnauthorizedException('Invalid token');
-    }
-    return this.generateTokens(user, refreshTokenDto.refreshToken);
   }
 }

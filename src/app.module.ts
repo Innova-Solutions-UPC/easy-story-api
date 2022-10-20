@@ -14,6 +14,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { ProfilesModule } from './profiles/profiles.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ConfigModule } from '@nestjs/config';
     QualificationsModule,
     SubscriptionsModule,
     HealthModule,
+    ProfilesModule,
   ],
   controllers: [AppController],
   providers: [
