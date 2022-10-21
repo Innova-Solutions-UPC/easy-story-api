@@ -36,7 +36,7 @@ export class Post {
   @Column({ length: 500, type: 'varchar', default: '' })
   content: string;
 
-  @Column({ length: 250, type: 'varchar', default: '' })
+  @Column({ type: 'varchar', default: '' })
   image: string;
 
   @ManyToOne(() => User, { eager: true })
