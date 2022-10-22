@@ -22,7 +22,7 @@ import { ProfilesModule } from './profiles/profiles.module';
     CacheModule.register(),
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 10,
+      limit: 40,
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
