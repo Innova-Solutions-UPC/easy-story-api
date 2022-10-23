@@ -33,7 +33,7 @@ export class User {
   @Column({ default: false, type: 'boolean' })
   verified: boolean;
 
-  @OneToOne(() => Profile)
+  @OneToOne(() => Profile, { cascade: true })
   @JoinColumn()
   profile: Profile;
 
@@ -49,5 +49,9 @@ export class User {
     if (this.password) {
       this.password = await argon2.hash(this.password);
     }
+  }
+
+  async comparePassword(attempt: string): Promise<boolean> {
+    return await argon2.verify(this.password, attempt);
   }
 }

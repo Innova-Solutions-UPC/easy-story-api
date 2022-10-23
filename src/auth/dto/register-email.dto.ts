@@ -4,6 +4,7 @@ import {
   IsLowercase,
   IsString,
   Length,
+  MaxLength,
 } from 'class-validator';
 
 export class RegisterEmailDto {
@@ -19,12 +20,15 @@ export class RegisterEmailDto {
   @IsString()
   password: string;
 
+  @MaxLength(50)
   @IsString()
   firstName: string;
 
+  @MaxLength(50)
   @IsString()
   lastName: string;
 
+  @MaxLength(250)
   @IsString()
   bio: string;
 }

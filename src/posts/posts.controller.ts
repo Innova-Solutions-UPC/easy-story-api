@@ -42,7 +42,7 @@ export class PostsController {
 
   @Get('posts')
   @Public()
-  @ApiOperation({ summary: 'Retrieve all posts' })
+  @ApiOperation({ summary: 'Retrieve all posts (feed)' })
   @ApiQuery({
     name: 'author',
     required: false,
@@ -73,7 +73,7 @@ export class PostsController {
     );
   }
 
-  @Get('user-posts')
+  @Get('my-posts')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Retrieve all posts by the authenticated user' })
   @ApiQuery({
@@ -116,13 +116,6 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
   ) {
     return this.postsService.update(+id, user, updatePostDto);
-  }
-
-  @Public()
-  @Patch('posts/:id/metadata')
-  @ApiOperation({ summary: 'Post metadata' })
-  updateMetadata(@Param('id') id: string, @Query('action') action: string) {
-    return this.postsService.updateMetadata(+id, action);
   }
 
   @Delete('posts/:id')

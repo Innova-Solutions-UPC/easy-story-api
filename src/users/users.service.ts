@@ -9,7 +9,6 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -28,11 +27,14 @@ export class UsersService {
    * @returns The user object is being returned.
    */
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const existentUser = await this.findOneByEmail(
-      createUserDto.email.toLowerCase(),
-    );
+    const existentUser = await this.usersRepository.findOne({
+      where: [
+        { email: createUserDto.email },
+        { username: createUserDto.username },
+      ],
+    });
     if (existentUser) {
-      throw new BadRequestException('Email is already in use');
+      throw new BadRequestException('Email or username is already in use');
     }
     const user = this.usersRepository.create({
       ...createUserDto,

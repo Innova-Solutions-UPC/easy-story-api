@@ -60,7 +60,7 @@ export class CommentsController {
 
   @Patch('/comments/:id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a comment' })
+  @ApiOperation({ summary: 'Update a comment that you made in a post' })
   update(
     @Param('id') id: string,
     @CurrentUser() user: User,

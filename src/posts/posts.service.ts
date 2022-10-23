@@ -13,6 +13,7 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { PostStatus } from './enums/post-status.enum';
+import slugify from 'slugify';
 
 @Injectable()
 export class PostsService {
@@ -42,7 +43,7 @@ export class PostsService {
     const post = this.postsRepository.create({
       ...createPostDto,
       slug:
-        createPostDto.title.replace(/\s/g, '-').toLowerCase() +
+        slugify(createPostDto.title) +
         '-' +
         Math.random().toString(36).substring(2, 7),
       author: user,
@@ -90,17 +91,6 @@ export class PostsService {
       delete query.where['status'];
     }
     return paginate<Post>(this.postsRepository, options, query);
-  }
-
-  async findAllByAuthor(authorUsername: string): Promise<Post[]> {
-    const author = await this.usersService.findOne(authorUsername);
-    return this.postsRepository.find({
-      where: {
-        author: {
-          id: author.id,
-        },
-      },
-    });
   }
 
   /**

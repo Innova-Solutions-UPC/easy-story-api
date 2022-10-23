@@ -8,10 +8,10 @@ export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 20, type: 'varchar' })
+  @Column({ length: 50, type: 'varchar' })
   firstName: string;
 
-  @Column({ length: 20, type: 'varchar' })
+  @Column({ length: 50, type: 'varchar' })
   lastName: string;
 
   @Column({ length: 250, type: 'varchar', default: '' })
