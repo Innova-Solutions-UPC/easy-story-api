@@ -73,7 +73,7 @@ export class PostsController {
     );
   }
 
-  @Get('my-posts')
+  @Get('user-posts')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Retrieve all posts by the authenticated user' })
   @ApiQuery({
