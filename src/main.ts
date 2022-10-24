@@ -18,7 +18,7 @@ async function bootstrap() {
   });
   /* Enabling CORS for the application. */
   app.enableCors({
-    origin: 'http://127.0.0.1:5173',
+    origin: ['http://127.0.0.1:5173', 'https://master.d15cj9b33gfb5p.amplifyapp.com'],
     methods: 'GET,HEAD,PATCH,POST,DELETE,OPTIONS',
   });
   /* Configuring validation pipes */
