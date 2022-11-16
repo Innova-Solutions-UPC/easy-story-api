@@ -33,7 +33,7 @@ export class Post {
   @Column({ length: 100, type: 'varchar' })
   description: string;
 
-  @Column({ length: 500, type: 'varchar', default: '' })
+  @Column({  type: 'text', default: '' })
   content: string;
 
   @Column({ type: 'varchar', default: '' })

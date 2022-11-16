@@ -74,9 +74,9 @@ export class PostsService {
         author: true,
         hashtags: true,
       },
-      where: {
+      /*where: {
         status: PostStatus.PUBLISHED,
-      } as FindOptionsWhere<Post>,
+      } as FindOptionsWhere<Post>,*/
       order: {
         createdAt: 'DESC',
       },
