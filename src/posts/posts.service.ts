@@ -87,9 +87,9 @@ export class PostsService {
     if (hashtag) {
       query.where['hashtags'] = { name: hashtag };
     }
-    if (currentUser) {
+    /*if (currentUser) {
       delete query.where['status'];
-    }
+    }*/
     return paginate<Post>(this.postsRepository, options, query);
   }
 
@@ -116,6 +116,7 @@ export class PostsService {
       slug,
       status: PostStatus.PUBLISHED,
     });
+    console.log(post)
     if (!post) {
       throw new NotFoundException('Post not found');
     }

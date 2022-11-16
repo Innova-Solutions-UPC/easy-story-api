@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { get } from 'http';
 import { CurrentUser } from '../common/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { CommentsService } from './comments.service';
@@ -35,6 +36,7 @@ export class CommentsController {
     @CurrentUser() user: User,
     @Body() createCommentDto: CreateCommentDto,
   ) {
+    console.log('aaa')
     return this.commentsService.create(user, slug, createCommentDto);
   }
 
@@ -45,6 +47,7 @@ export class CommentsController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: 10,
   ) {
+    console.log('ssssss')
     return this.commentsService.findAllByPost(slug, {
       page,
       limit,

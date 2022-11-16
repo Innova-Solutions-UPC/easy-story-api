@@ -29,9 +29,9 @@ export class BookmarksService {
     createBookmarkDto: CreateBookmarkDto,
     user: User,
   ): Promise<Bookmark> {
-    if (createBookmarkDto.user && user.id !== +createBookmarkDto.user) {
+    /*if (createBookmarkDto.user && user.id !== +createBookmarkDto.user) {
       throw new BadRequestException('You can only bookmark your own posts');
-    }
+    }*/
     const existingBookmark = await this.bookmarksRepository.findOneBy({
       user: {
         id: user.id,
