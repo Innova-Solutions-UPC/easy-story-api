@@ -34,9 +34,10 @@ export class CommentsService {
     createCommentDto: CreateCommentDto,
   ): Promise<Comment> {
     const post = await this.postsService.findOneBySlug(postSlug);
-    if (post.status == PostStatus.PUBLISHED) {
+    /*if (post.status == PostStatus.DRAFT) {
       throw new BadRequestException('You cannot comment on a draft post');
     }
+    console.log(post)*/
     const comment = this.commentsRepository.create({
       ...createCommentDto,
       post,
