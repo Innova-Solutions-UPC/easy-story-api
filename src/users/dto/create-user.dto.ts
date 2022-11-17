@@ -15,4 +15,7 @@ export class CreateUserDto {
 
   @IsString()
   lastName: string;
+
+  @IsString()
+  image: string;
 }

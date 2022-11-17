@@ -26,6 +26,9 @@ export class User {
   @Column({ unique: true, length: 50, type: 'varchar' })
   email: string;
 
+  @Column({ type: 'varchar', default: '' })
+  image: string;
+
   @Exclude()
   @Column({ length: 96, type: 'varchar' })
   password: string;

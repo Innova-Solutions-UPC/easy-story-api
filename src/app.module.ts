@@ -31,6 +31,7 @@ import { ProfilesModule } from './profiles/profiles.module';
         autoLoadEntities: true,
         synchronize: true,
         entityPrefix: 'ds_',
+        ssl: true
       }),
     }),
     AuthModule,

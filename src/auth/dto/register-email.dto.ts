@@ -28,6 +28,9 @@ export class RegisterEmailDto {
   @IsString()
   lastName: string;
 
+  @IsString()
+  image: string;
+
   @MaxLength(250)
   @IsString()
   bio: string;
