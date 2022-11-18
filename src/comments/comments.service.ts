@@ -19,7 +19,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
     private readonly postsService: PostsService,
-  ) {}
+  ) { }
 
   /**
    * It creates a comment for a given post, but only if the post is published
@@ -61,8 +61,10 @@ export class CommentsService {
   ): Promise<Pagination<Comment>> {
     const post = await this.postsService.findOneBySlug(postSlug);
     return paginate<Comment>(this.commentsRepository, options, {
-      post: {
-        id: post.id,
+      where: {
+        post: {
+          id: post.id,
+        },
       },
       relations: {
         user: true,
