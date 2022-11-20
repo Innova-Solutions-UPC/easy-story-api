@@ -30,7 +30,7 @@ export class Post {
   @Column({ length: 100, type: 'varchar', unique: true })
   slug: string;
 
-  @Column({ length: 100, type: 'varchar' })
+  @Column({  type: 'text', default: '' })
   description: string;
 
   @Column({  type: 'text', default: '' })
