@@ -116,7 +116,6 @@ export class PostsService {
       slug,
       status: PostStatus.PUBLISHED,
     });
-    console.log(post)
     if (!post) {
       throw new NotFoundException('Post not found');
     }
