@@ -84,13 +84,14 @@ export class UsersService {
    * @returns The user object
    */
   async update(username: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.usersRepository.preload({
-      ...updateUserDto,
-      username: username,
-    });
+    const user = await this.findOne(username);
     if (!user) {
       throw new BadRequestException(`User number #${username} not found`);
     }
+    user.profile.firstName = updateUserDto.firstName;
+    user.profile.lastName = updateUserDto.lastName;
+    user.image = updateUserDto.image;
+    delete user.password;
     return this.usersRepository.save(user);
   }
 
