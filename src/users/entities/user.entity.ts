@@ -36,7 +36,7 @@ export class User {
   @Column({ default: false, type: 'boolean' })
   verified: boolean;
 
-  @OneToOne(() => Profile, { cascade: true })
+  @OneToOne(() => Profile, { cascade: true, eager: true })
   @JoinColumn()
   profile: Profile;
 
